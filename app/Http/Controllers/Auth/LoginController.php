@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\DB;
+use App\Models\pelicula;
+class LoginController extends Controller
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Login Controller
+    |--------------------------------------------------------------------------
+    |
+    | This controller handles authenticating users for the application and
+    | redirecting them to your home screen. The controller uses a trait
+    | to conveniently provide its functionality to your applications.
+    |
+    */
+
+    use AuthenticatesUsers;
+
+    /**
+     * Where to redirect users after login.
+     *
+     * @var string
+     */
+    protected $redirectTo = RouteServiceProvider::INDEX;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }
+    
+    
+    
+    public function index(){
+        
+        
+        $data = [];
+        
+        if(pelicula::select("*")->where('deleted_at', null)->exists()){
+            
+            $data['ultimasPelis'] = DB::table('peliculas')->select("*")->where('deleted_at', null)->limit(3)->get(); 
+        }else{
+             $data['ultimasPelis'] = null;
+            
+        }        
+        
+        
+        return view('auth.login',$data);
+    }
+}
